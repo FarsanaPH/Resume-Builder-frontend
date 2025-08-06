@@ -1,12 +1,34 @@
-# React + Vite
+# Resume Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A *React-powered* web application that helps users create professional resumes quickly and easily.
 
-Currently, two official plugins are available:
+*Create job-winning resume in minutes — live preview, best templates, and instant download!*
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project simplifies the resume creation process for job seekers — allowing them to focus on their content, while the app handles formatting, structure, and PDF export.
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Features
+
+- *Live Resume Preview*
+- *Download Resume as PDF*
+- *Edit & Reuse Past Resume History*
+- *Stepper-based Navigation* 
+- *Responsive Design* 
+
+
+## Tech Stack
+
+This project is built using *MERN stack* and modern frontend tools:
+
+- *MongoDB*
+- *Express.js*
+- *React* 
+- *Node.js* 
+- *JavaScript (ES6+)*
+- *Bootstrap* 
+- *Material UI* 
+- *Vite*
+
+---
+
+> “Great code speaks for itself — but a clean resume helps too!”  — *Thanks for visiting the project.* 😊
