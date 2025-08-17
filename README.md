@@ -7,12 +7,12 @@ The UI blends **Material UI** components with **Bootstrap** layout utilities for
 
 ## Project Purpose
 
-This project is designed to **streamline the process of resume creation** so users can:
+The goal of this project is to **simplify resume building** so users can focus on content while the app handles formatting and structure. Users can:
 
-- **Create polished resumes** without working on formatting  
-- **Preview Live changes** before saving or downloading  
-- **Save resumes to history** so they can quickly edit or reuse later for new roles.
-- **Export to PDF** with instant download.
+- **Create resumes** without dealing with formatting 
+- **Preview Live changes** while typing itself before saving or downloading  
+- **Saved resume history** so they can quickly edit, delete or reuse them later for new roles
+- **Export to PDF** and apply for jobs.
 
 
 ## Features
@@ -20,18 +20,17 @@ This project is designed to **streamline the process of resume creation** so use
 - **Full CRUD on Resumes**  
   Create, view, edit, and delete resumes with structured sections.  
   
-
-- **Component Reusability**  
-  Shared, reusable components for efficiency — e.g., the **same modal used for Editing**
-
 - **Stepper-Based Flow with Strong Inline Validations**  
   Guided sections (Profile, Experience, Education, Skills, etc.) with **field-level checks** and **per-step validation** before proceeding.
+
+- **Component Reusability**  
+  Shared, reusable components for efficiency — e.g., **same modal used for Editing**
 
 - **Live Preview While Typing**  
   See exactly how your resume will look—no guesswork, no extra clicks.
   
 - **Resume History**  
-  Keep track of previously created resumes, **downlaod,delete, edit or reuse** them for new tailored applications. 
+  Keep track of previously created resumes, **download, delete, edit or reuse** them for new tailored applications. 
 
 - **Instant PDF Download**  
   Export your finalized resume to **PDF** in one click.
@@ -57,4 +56,4 @@ This project is built using:
 
 ---
 
-> “Great code speaks for itself — but a clean resume gets you ahead!”  — **Thanks for visiting the project.** 😊
+> “Great code speaks for itself — but a clean resume gets you an interview!”  — **Thanks for visiting the project.** 😊
