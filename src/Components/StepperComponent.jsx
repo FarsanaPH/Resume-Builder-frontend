@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -144,70 +144,66 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
         if (!skills || !name || !jobTitle || !location || !email || !phoneNumber ||
             !courseName || !college || !university || !year || !jobRole ||
             !company || !companyLocation || !duration || !summary) {
-            toast.error(`Fill the details completely!!`)
+                toast.error("Fill the resume details completely")
+
+        }
+        else {
+            setActiveStep((prev) => prev + 1);
         }
     }
 
+
     const handleNext = () => {
-        // Run validation for current step
-        switch (activeStep) {
-            case 0:
-                validateField("name", resumeData.name);
-                validateField("jobTitle", resumeData.jobTitle);
-                validateField("location", resumeData.location);
-                break;
-            case 1:
-                validateField("email", resumeData.email);
-                validateField("phoneNumber", resumeData.phoneNumber);
-                validateField("github", resumeData.github);
-                validateField("linkedIn", resumeData.linkedIn);
-                validateField("portfolio", resumeData.portfolio);
-                break;
-            case 2:
-                validateField("courseName", resumeData.courseName);
-                validateField("college", resumeData.college);
-                validateField("university", resumeData.university);
-                validateField("year", resumeData.year);
-                break;
-            case 3:
-                validateField("jobRole", resumeData.jobRole);
-                validateField("company", resumeData.company);
-                validateField("companyLocation", resumeData.companyLocation);
-                validateField("duration", resumeData.duration);
-                break;
-            case 5:
-                validateField("summary", resumeData.summary);
-                break;
-            default:
-                break;
-        }
+               // Define which fields are required for each step
+        const stepRequiredFields = {
+            0: ["name", "jobTitle", "location"],
+            1: ["email", "phoneNumber", "github", "linkedIn", "portfolio"],
+            2: ["courseName", "college", "university", "year"],
+            3: ["jobRole", "company", "companyLocation", "duration"],
+            4: ["skills"],   // must add at least one skill
+            5: ["summary"],
+        };
 
+        const requiredFields = stepRequiredFields[activeStep] || [];
 
-        // Validation before clicking finish
-        if (activeStep === steps.length - 1) {
-            // Last step, don't directly finish
-            handleFinish()
-        }
-        else {
-            if (!skills || !name || !jobTitle || !location || !email || !phoneNumber ||
-                !courseName || !college || !university || !year || !jobRole ||
-                !company || !companyLocation || !duration || !summary) {
+        let allValid = true;
 
-            } else {
-                let newSkipped = skipped;
-                if (isStepSkipped(activeStep)) {
-                    newSkipped = new Set(newSkipped.values());
-                    newSkipped.delete(activeStep);
-                }
-                setActiveStep((prevActiveStep) => prevActiveStep + 1);
-                setSkipped(newSkipped);
+        // validate only current step's fields
+        requiredFields.forEach((field) => {
+            const value = resumeData[field];
+            validateField(field, value); // validate fnc called
+            if (!value || (Array.isArray(value) && value.length === 0)) {
+                allValid = false;
             }
+        });
+
+         if(activeStep === steps.length - 1){
+            handleFinish()
+            return
+        }
+
+        if (!allValid) {
+            return;
+        }
+
+        // If it's the last step, trigger final submit
+        if (activeStep < steps.length - 1) {
+            //     handleFinish();
+            // } else {
+            // Otherwise go to next step
+            let newSkipped = skipped;
+            if (isStepSkipped(activeStep)) {
+                newSkipped = new Set(newSkipped.values());
+                newSkipped.delete(activeStep);
+            }
+            setActiveStep((prevActiveStep) => prevActiveStep + 1);
+            setSkipped(newSkipped);
         }
     };
 
 
+
     // for validations
-    // const inputRefs = useRef({});
     const [errors, setErrors] = useState({});
     const validateField = (name, value) => {
         let message = "";
@@ -222,8 +218,12 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
             case "company":
             case "companyLocation":
             case "duration":
-            case "skills":
                 if (!value.trim()) message = "This field is required";
+                break;
+            case "skills":
+                if (!Array.isArray(value) || value.length === 0) {
+                    message = "Please add at least one skill";
+                }
                 break;
             case "email":
                 if (!value) message = "Email is required";
@@ -235,7 +235,7 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                 break;
             case "year":
                 if (!value) message = "Year is required";
-                else if (value < 1900 || value > 2100) message = "Enter a valid year";
+                else if (isNaN(value) || value < 1900 || value > new Date().getFullYear()) message = "Enter a valid year";
                 break;
             case "github":
             case "linkedIn":
@@ -595,8 +595,8 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                                     setInputSkill(e.target.value)
                                     validateField("skills", e.target.value);
                                 }}
-                                error={!!errors.phone}
-                                helperText={errors.phone}
+                                error={!!errors.skills}
+                                helperText={errors.skills}
 
                                 maxRows={4}
                                 variant="standard"
@@ -695,7 +695,7 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2 }}>
                             <button onClick={handleReset} className='btn btn-danger'>RESET</button>
                             {/* this function handleSubmitResume do api call to addresume to db.json   */}
-                            <button onClick={handleSubmitResume} className='btn text-light bg-success' >SUBMIT RESUME</button>
+                            <button onClick={handleSubmitResume} className='btn text-light bg-success' >SAVE RESUME</button>
                         </Box>
                     </React.Fragment>
                 ) : (

@@ -9,7 +9,7 @@ import { getEditResumeAPI, updateResumeAPI } from '../Service/allApi';
 import { toast } from 'react-toastify';
 import { TiDelete } from "react-icons/ti";
 
-function Edit({ editID, setResumeData }) {
+function Edit({ editID, setResumeData, isHistory, getAllResume }) {
     console.log("Edit ID:", editID);
 
     const [show, setShow] = useState(false);
@@ -65,9 +65,13 @@ function Edit({ editID, setResumeData }) {
             try {
                 const result = await updateResumeAPI(editID, editData)  //this gives the object with id eqauls to now submitted resume id
                 console.log("result", result);
-                setResumeData(result.data)
-                handleClose()
+                isHistory ? (
+                    getAllResume()
+                ): (
+                     setResumeData(result.data)
+                )
 
+                handleClose()
             } catch (err) {
                 console.log("Server Error:", err);
                 toast.error("Server Error: Failed in Fetching Data, Please Try Again!!")
@@ -99,9 +103,19 @@ function Edit({ editID, setResumeData }) {
 
     return (
         <>
-            <button  onClick={handleShow} className='btn text-light' style={{ backgroundColor: 'purple' }}>
-                <FaEdit />
-            </button>
+            {
+                isHistory ? (
+                    <span onClick={handleShow} className=' text-secondary fs-5' >
+                        <FaEdit />
+                    </span>
+
+                ) : (
+                    <button onClick={handleShow} className='btn text-light' style={{ backgroundColor: 'purple' }}>
+                        <FaEdit />
+                    </button>
+
+                )
+            }
 
             <Modal
                 show={show}
@@ -311,8 +325,8 @@ function Edit({ editID, setResumeData }) {
                             <h5>Selected Skills :</h5>
                             <div className=''>
                                 {
-                                    editData?.skills.map((item) => (
-                                        <span className='btn btn-primary mb-3 me-3'>
+                                    editData?.skills.map((item,index) => (
+                                        <span className='btn btn-primary mb-3 me-3' key={index}>
                                             {item} {/*items in skills array*/}
                                             <button onClick={() => deleteSkill(item)} className='btn btn-primary'>
                                                 <TiDelete className='fs-3' />

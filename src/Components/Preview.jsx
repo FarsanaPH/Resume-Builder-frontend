@@ -74,43 +74,45 @@ function Preview({ resumeData, editID, setResumeData, isSubmitted }) {
       </div>
 
       {/* id setted for PDF*/}
-      <div id="result" className="mx-1 mx-md-5 my-3 shadow-lg rounded px-5 pb-5">
-        <div>
-          <div className="text-center">
-            <h3 className="pt-3">{name || "Your Name"}</h3> {/*OR <h3 className="pt-3">{resumeData?.name || "Your Name"}</h3> */}
-            <span className='pt-2 text-primary'>{jobTitle || "Job Role"}</span>
+      <div id="result">
+        <div  className="mx-1 mx-md-5 my-3 shadow-lg rounded px-5 pb-5">
+          <div >
+            <div className="text-center">
+              <h3 className="pt-3">{name || "Your Name"}</h3> {/*OR <h3 className="pt-3">{resumeData?.name || "Your Name"}</h3> */}
+              <span className='pt-2 text-primary'>{jobTitle || "Job Role"}</span>
+            </div>
+            <div className='text-center mt-2'>
+              <h6>{phoneNumber || "Phone Number"} | {email || "youremail@gmail.com"}  | {location || "Location"}</h6>
+            </div>
+            <div className="mt-2 text-center">
+              <a href={github} target='_blank' className="me-3 ms-3">Github</a> |
+              <a href={linkedIn} target='_blank' className="me-3 ms-3">LinkedIn</a> |
+              <a href={portfolio} target='_blank' className="me-3 ms-3">Portfolio</a>
+            </div>
           </div>
-          <div className='text-center mt-2'>
-            <h6>{phoneNumber || "Phone Number"} | {email || "youremail@gmail.com"}  | {location || "Location"}</h6>
+          <div className='mt-3'>
+            <Divider>Summary</Divider>
+            <p style={{ textAlign: "justify" }}>{summary || "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto itaque ut suscipit qui minus doloribus similique, delectus optio autem. Quidem illo eaque nulla maxime esse sint, eius soluta hic quibusdam?"}</p>
           </div>
-          <div className="mt-2 text-center">
-            <a href={github} target='_blank' className="me-3 ms-3">Github</a> |
-            <a href={linkedIn} target='_blank' className="me-3 ms-3">LinkedIn</a> |
-            <a href={portfolio} target='_blank' className="me-3 ms-3">Portfolio</a>
+          <div className='mt-3 text-center'>
+            <Divider>Education</Divider>
+            <h6 className='mt-2'>{courseName || "Course Name"}</h6>
+            <h6>{college || "College"} | {university || "University"}  | {year || "Passout Year"}</h6>
           </div>
-        </div>
-        <div className='mt-3'>
-          <Divider>Summary</Divider>
-          <p style={{ textAlign: "justify" }}>{summary || "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto itaque ut suscipit qui minus doloribus similique, delectus optio autem. Quidem illo eaque nulla maxime esse sint, eius soluta hic quibusdam?"}</p>
-        </div>
-        <div className='mt-3 text-center'>
-          <Divider>Education</Divider>
-          <h6 className='mt-2'>{courseName || "Course Name"}</h6>
-          <h6>{college || "College"} | {university || "University"}  | {year || "Passout Year"}</h6>
-        </div>
-        <div className='mt-3 text-center'>
-          <Divider>Professional Experience</Divider>
-          <h6 className='mt-2'>{jobRole || "Job Role"}</h6>
-          <h6>{company || "Company"} | {companyLocation || "Location"}  | {duration || "Duration"}</h6>
-        </div>
-        <div className='mt-3 text-start '>
-          <Divider>Skills</Divider>
-          <div className="m-2 d-flex flex-wrap">
-            {
-              skills?.map((item) => (
-                <span className=' me-3 mt-1'>{item}</span>
-              ))
-            }
+          <div className='mt-3 text-center'>
+            <Divider>Professional Experience</Divider>
+            <h6 className='mt-2'>{jobRole || "Job Role"}</h6>
+            <h6>{company || "Company"} | {companyLocation || "Location"}  | {duration || "Duration"}</h6>
+          </div>
+          <div className='mt-3 text-start '>
+            <Divider>Skills</Divider>
+            <div className="m-2 d-flex flex-wrap">
+              {
+                skills?.map((item) => (
+                  <span className=' me-3 mt-1'>{item}</span>
+                ))
+              }
+            </div>
           </div>
         </div>
       </div>
