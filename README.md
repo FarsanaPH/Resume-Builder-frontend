@@ -17,11 +17,8 @@ This project is designed to **streamline the process of resume creation** so use
 
 ## Features
 
-- **Full CRUD on Resumes**  
-  - **Create** new resumes with structured sections  
-  - **View** all saved resumes in history
-  - **Edit** any saved resumes in history and also in preview
-  - **Delete** old versions you don't need  
+- **Full CRUD on Resumes**
+  Create / View / Update / Delete Resumes with structured sections.   
 
 - **Component Reusability**  
   Shared, reusable components for efficiency — e.g., the **same modal used for Editing**
