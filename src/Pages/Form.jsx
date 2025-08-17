@@ -30,7 +30,7 @@ function Form() {
     const [isSubmitted, setIsSubmitted] = useState(false)
     return (
         <>
-            <div className="container mt-5">
+            <div className="container my-5">
                 {
                     isSubmitted ?
                         <div className="row">
