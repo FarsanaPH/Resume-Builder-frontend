@@ -36,7 +36,7 @@ function Form() {
                         <div className="row">
                             <div className="col-3"></div>
                             <div className="col-md-6">
-                                <Preview resumeData={resumeData} editID={editID}/>
+                                <Preview isSubmitted={isSubmitted} resumeData={resumeData} setResumeData={setResumeData} editID={editID}/>
                             </div>
                             <div className="col-3"></div>
                         </div>

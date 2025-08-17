@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -57,9 +57,9 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
     // this function do api call to submit resume to backend db.json
     const handleSubmitResume = async () => {
         if (!skills || !name || !jobTitle || !location || !email || !phoneNumber ||
-            !github || !linkedIn || !portfolio || !courseName || !college || !university ||
-            !year || !jobRole || !company || !companyLocation || !duration || !summary) {
-            toast.warning(`Fill the form completely!!`)
+            !courseName || !college || !university || !year || !jobRole ||
+            !company || !companyLocation || !duration || !summary) {
+            toast.error(`Fill the form completely!!`)
         } else {
             try {
                 const result = await addResumeAPI(resumeData) //addResumeAPI is function in allApi.js in service
@@ -101,34 +101,19 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
         return skipped.has(step);
     };
 
-    const handleNext = () => {
-        let newSkipped = skipped;
-        if (isStepSkipped(activeStep)) {
-            newSkipped = new Set(newSkipped.values());
-            newSkipped.delete(activeStep);
-        }
-
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        setSkipped(newSkipped);
-    };
 
     const handleBack = () => {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
     const handleSkip = () => {
-        if (!isStepOptional(activeStep)) {
-            // You probably want to guard against something like this,
-            // it should never occur unless someone's actively trying to break something.
-            throw new Error("You can't skip a step that isn't optional.");
+        let newSkipped = skipped;
+        if (isStepSkipped(activeStep)) {
+            newSkipped = new Set(newSkipped.values());
+            newSkipped.delete(activeStep);
         }
-
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        setSkipped((prevSkipped) => {
-            const newSkipped = new Set(prevSkipped.values());
-            newSkipped.add(activeStep);
-            return newSkipped;
-        });
+        setSkipped(newSkipped);
     };
 
     const handleReset = () => {
@@ -155,6 +140,113 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
         })
     };
 
+    const handleFinish = () => {
+        if (!skills || !name || !jobTitle || !location || !email || !phoneNumber ||
+            !courseName || !college || !university || !year || !jobRole ||
+            !company || !companyLocation || !duration || !summary) {
+            toast.error(`Fill the details completely!!`)
+        }
+    }
+
+    const handleNext = () => {
+        // Run validation for current step
+        switch (activeStep) {
+            case 0:
+                validateField("name", resumeData.name);
+                validateField("jobTitle", resumeData.jobTitle);
+                validateField("location", resumeData.location);
+                break;
+            case 1:
+                validateField("email", resumeData.email);
+                validateField("phoneNumber", resumeData.phoneNumber);
+                validateField("github", resumeData.github);
+                validateField("linkedIn", resumeData.linkedIn);
+                validateField("portfolio", resumeData.portfolio);
+                break;
+            case 2:
+                validateField("courseName", resumeData.courseName);
+                validateField("college", resumeData.college);
+                validateField("university", resumeData.university);
+                validateField("year", resumeData.year);
+                break;
+            case 3:
+                validateField("jobRole", resumeData.jobRole);
+                validateField("company", resumeData.company);
+                validateField("companyLocation", resumeData.companyLocation);
+                validateField("duration", resumeData.duration);
+                break;
+            case 5:
+                validateField("summary", resumeData.summary);
+                break;
+            default:
+                break;
+        }
+
+
+        // Validation before clicking finish
+        if (activeStep === steps.length - 1) {
+            // Last step, don't directly finish
+            handleFinish()
+        }
+        else {
+            if (!skills || !name || !jobTitle || !location || !email || !phoneNumber ||
+                !courseName || !college || !university || !year || !jobRole ||
+                !company || !companyLocation || !duration || !summary) {
+
+            } else {
+                let newSkipped = skipped;
+                if (isStepSkipped(activeStep)) {
+                    newSkipped = new Set(newSkipped.values());
+                    newSkipped.delete(activeStep);
+                }
+                setActiveStep((prevActiveStep) => prevActiveStep + 1);
+                setSkipped(newSkipped);
+            }
+        }
+    };
+
+
+    // for validations
+    // const inputRefs = useRef({});
+    const [errors, setErrors] = useState({});
+    const validateField = (name, value) => {
+        let message = "";
+        switch (name) {
+            case "name":
+            case "jobTitle":
+            case "location":
+            case "courseName":
+            case "college":
+            case "university":
+            case "jobRole":
+            case "company":
+            case "companyLocation":
+            case "duration":
+            case "skills":
+                if (!value.trim()) message = "This field is required";
+                break;
+            case "email":
+                if (!value) message = "Email is required";
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) message = "Invalid email format";
+                break;
+            case "phoneNumber":
+                if (!value) message = "Phone number is required";
+                else if (!/^[0-9]{10}$/.test(value)) message = "Enter a valid 10-digit number";
+                break;
+            case "year":
+                if (!value) message = "Year is required";
+                else if (value < 1900 || value > 2100) message = "Enter a valid year";
+                break;
+            case "github":
+            case "linkedIn":
+            case "portfolio":
+                if (value && !/^https?:\/\/.+\..+/.test(value)) message = "Enter a valid URL";
+                break;
+            default: break;
+        }
+        setErrors((prev) => ({ ...prev, [name]: message }));
+    };
+
     // The called renderStepperContent function from below which is seen on webpage
     // if we click NEXT, setactivesteps  increments and when we click BACk, setactivesteps decrements
     const renderStepperContent = (stepIndex) => {
@@ -165,9 +257,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                     <Grid container spacing={2}>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, name: e.target.value })}
+                                name="name"
                                 value={resumeData.name}
-                                label="Full Name"
+                                label="Full Name*"
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, name: e.target.value });
+                                    validateField("name", e.target.value);
+                                }}
+                                error={!!errors.name}
+                                helperText={errors.name}
+
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -175,9 +276,17 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, jobTitle: e.target.value })}
+                                name="jobTitle"
                                 value={resumeData.jobTitle}
-                                label="Job Title"
+                                label="Job Title*"
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, jobTitle: e.target.value });
+                                    validateField("jobTitle", e.target.value);
+                                }}
+                                error={!!errors.jobTitle}
+                                helperText={errors.jobTitle}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -185,9 +294,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, location: e.target.value })}
+                                name="location"
                                 value={resumeData.location}
-                                label="Location"
+                                label="Location*"
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, location: e.target.value });
+                                    validateField("location", e.target.value);
+                                }}
+                                error={!!errors.location}
+                                helperText={errors.location}
+
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -204,9 +322,17 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                     <Grid container spacing={2}>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, email: e.target.value })}
+                                name="email"
                                 value={resumeData.email}
-                                label="Email"
+                                label="Email*"
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, email: e.target.value });
+                                    validateField("email", e.target.value);
+                                }}
+                                error={!!errors.email}
+                                helperText={errors.email}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -214,9 +340,17 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, phoneNumber: e.target.value })}
+                                name="phoneNumber"
                                 value={resumeData.phoneNumber}
-                                label="Phone Number"
+                                label="Phone Number*"
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, phoneNumber: e.target.value });
+                                    validateField("phoneNumber", e.target.value);
+                                }}
+                                error={!!errors.phoneNumber}
+                                helperText={errors.phoneNumber}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -224,9 +358,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, github: e.target.value })}
+                                name="github"
                                 value={resumeData.github}
                                 label="GitHub Profile Link"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, github: e.target.value });
+                                    validateField("github", e.target.value);
+                                }}
+                                error={!!errors.github}
+                                helperText={errors.github}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -234,9 +377,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, linkedIn: e.target.value })}
+                                name="linkedIn"
                                 value={resumeData.linkedIn}
                                 label="LinkedIn Profile Link"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, linkedIn: e.target.value });
+                                    validateField("linkedIn", e.target.value);
+                                }}
+                                error={!!errors.linkedIn}
+                                helperText={errors.linkedIn}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -244,9 +396,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, portfolio: e.target.value })}
+                                name="portfolio"
                                 value={resumeData.portfolio}
                                 label="Portfolio Link"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, portfolio: e.target.value });
+                                    validateField("portfolio", e.target.value);
+                                }}
+                                error={!!errors.portfolio}
+                                helperText={errors.portfolio}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -261,9 +422,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                     <Grid container spacing={2}>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, courseName: e.target.value })}
+                                name="courseName"
                                 value={resumeData.courseName}
-                                label="Course Name"
+                                label="Course Name*"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, courseName: e.target.value });
+                                    validateField("courseName", e.target.value);
+                                }}
+                                error={!!errors.courseName}
+                                helperText={errors.courseName}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -271,9 +441,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, college: e.target.value })}
+                                name="college"
                                 value={resumeData.college}
-                                label="College Name"
+                                label="College Name*"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, college: e.target.value });
+                                    validateField("college", e.target.value);
+                                }}
+                                error={!!errors.college}
+                                helperText={errors.college}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -281,9 +460,17 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, university: e.target.value })}
+                                name="university"
                                 value={resumeData.university}
-                                label="University"
+                                label="University*"
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, university: e.target.value });
+                                    validateField("university", e.target.value);
+                                }}
+                                error={!!errors.university}
+                                helperText={errors.university}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -291,9 +478,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, year: e.target.value })}
+                                name="year"
                                 value={resumeData.year}
-                                label="Year of Passout"
+                                label="Year of Passout*"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, year: e.target.value });
+                                    validateField("year", e.target.value);
+                                }}
+                                error={!!errors.year}
+                                helperText={errors.year}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -308,9 +504,19 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                     <Grid container spacing={2}>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, jobRole: e.target.value })}
+                                name="jobRole"
                                 value={resumeData.jobRole}
-                                label="Job or Internship"
+                                label="Job Role*"
+
+                                onChange={(e) => {
+
+                                    setResumeData({ ...resumeData, jobRole: e.target.value });
+                                    validateField("jobRole", e.target.value);
+                                }}
+                                error={!!errors.jobRole}
+                                helperText={errors.jobRole}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -318,9 +524,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, company: e.target.value })}
+                                name="company"
                                 value={resumeData.company}
-                                label="Company Name"
+                                label="Company Name*"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, company: e.target.value });
+                                    validateField("company", e.target.value);
+                                }}
+                                error={!!errors.company}
+                                helperText={errors.company}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -328,9 +543,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, companyLocation: e.target.value })}
+                                name="companyLocation"
                                 value={resumeData.companyLocation}
-                                label="Location"
+                                label="Location*"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, companyLocation: e.target.value });
+                                    validateField("companyLocation", e.target.value);
+                                }}
+                                error={!!errors.companyLocation}
+                                helperText={errors.companyLocation}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -338,9 +562,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, duration: e.target.value })}
+                                name="duration"
                                 value={resumeData.duration}
-                                label="Duration"
+                                label="Duration*"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, duration: e.target.value });
+                                    validateField("duration", e.target.value);
+                                }}
+                                error={!!errors.duration}
+                                helperText={errors.duration}
+
+
                                 maxRows={4}
                                 variant="standard"
                                 fullWidth
@@ -352,40 +585,51 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
             case 4: return (
                 <>
                     <h3>Skills & Certifications</h3>
-                    <TextField
-                        onChange={(e) => setInputSkill(e.target.value)}
-                        value={inputSkill}
-                        label="Add Skill"
-                        maxRows={4}
-                        variant="standard"
-                        multiline
-                        fullWidth
-                    />
-                    <Button onClick={() => addSkill(inputSkill)} className='btn btn-primary mt-3' variant='outlined'>ADD+</Button>
+                    <Grid container spacing={2}>
+                        <Grid size={12}>
+                            <TextField
+                                value={inputSkill}
+                                name="skills"
+                                label="Add Skill*"
+                                onChange={(e) => {
+                                    setInputSkill(e.target.value)
+                                    validateField("skills", e.target.value);
+                                }}
+                                error={!!errors.phone}
+                                helperText={errors.phone}
 
-                    <div className="mt-3">
-                        <h5>Suggestions :</h5>
-                        {
-                            suggestion?.map((item) => (
-                                <Button onClick={() => addSkill(item)} className='btn btn-primary mt-3 me-2' variant='outlined'>{item}</Button>
-                            ))
-                        }
-                    </div>
+                                maxRows={4}
+                                variant="standard"
+                                multiline
+                                fullWidth
+                            />
+                            <Button onClick={() => addSkill(inputSkill)} className='btn btn-primary mt-3' variant='outlined'>ADD+</Button>
 
-                    <div className="mt-3">
-                        <h5>Added Skills:</h5>
-                        {
-                            skills?.length > 0 ?
-                                skills?.map((item) => (
-                                    <span className='btn btn-primary mb-3 me-3'>
-                                        {item} {/*items in skill array*/}
-                                        <button onClick={() => deleteSkill(item)} className='btn btn-primary'>
-                                            <TiDelete className='fs-3' />
-                                        </button>
-                                    </span>
-                                )) : ""
-                        }
-                    </div>
+                            <div className="mt-3">
+                                <h5>Suggestions :</h5>
+                                {
+                                    suggestion?.map((item) => (
+                                        <Button onClick={() => addSkill(item)} className='btn btn-primary mt-3 me-2' variant='outlined'>{item}</Button>
+                                    ))
+                                }
+                            </div>
+
+                            <div className="mt-3">
+                                <h5>Added Skills:</h5>
+                                {
+                                    skills?.length > 0 ?
+                                        skills?.map((item) => (
+                                            <span className='btn btn-primary mb-3 me-3'>
+                                                {item} {/*items in skill array*/}
+                                                <button onClick={() => deleteSkill(item)} className='btn btn-primary'>
+                                                    <TiDelete className='fs-3' />
+                                                </button>
+                                            </span>
+                                        )) : ""
+                                }
+                            </div>
+                        </Grid>
+                    </Grid>
                 </>
             );
             case 5: return (
@@ -394,9 +638,18 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                     <Grid container spacing={2}>
                         <Grid size={12}>
                             <TextField
-                                onChange={(e) => setResumeData({ ...resumeData, summary: e.target.value })}
+                                name="summary"
                                 value={resumeData.summary}
                                 label="Write a short summary of yourself"
+
+                                onChange={(e) => {
+                                    setResumeData({ ...resumeData, summary: e.target.value });
+                                    validateField("summary", e.target.value);
+                                }}
+                                error={!!errors.summary}
+                                helperText={errors.summary}
+
+
                                 variant="standard"
                                 fullWidth
                                 multiline
@@ -413,8 +666,8 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
 
     return (
         <>
-            <Box sx={{ width: '100%', marginBottom: "55%" }}>
-                <Stepper activeStep={activeStep}>
+            <Box sx={{ width: '100%' }}  >
+                <Stepper activeStep={activeStep} className='d-flex flex-wrap flex-lg-nowrap gap-3 gap-lg-0' >
                     {/* here used the array steps */}
                     {steps.map((label, index) => {
                         const stepProps = {};
@@ -428,21 +681,21 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                             stepProps.completed = false;
                         }
                         return (
-                            <Step key={label} {...stepProps}>
-                                <StepLabel {...labelProps}>{label}</StepLabel>
+                            <Step key={label} {...stepProps} >
+                                <StepLabel {...labelProps} >{label}</StepLabel>
                             </Step>
                         );
                     })}
                 </Stepper>
                 {activeStep === steps.length ? (
-                    <React.Fragment>
+                    <React.Fragment >
                         <Typography sx={{ mt: 2, mb: 1 }}>
                             All steps completed - you&apos;re finished
                         </Typography>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 2 }}>
                             <button onClick={handleReset} className='btn btn-danger'>RESET</button>
                             {/* this function handleSubmitResume do api call to addresume to db.json   */}
-                            <button onClick={handleSubmitResume} className='btn btn-success'>SUBMIT RESUME</button>
+                            <button onClick={handleSubmitResume} className='btn text-light bg-success' >SUBMIT RESUME</button>
                         </Box>
                     </React.Fragment>
                 ) : (
@@ -460,12 +713,14 @@ function StepperComponent({ resumeData, setResumeData, setIsSubmitted, setEditID
                                 Back
                             </Button>
                             <Box sx={{ flex: '1 1 auto' }} />
-                            {isStepOptional(activeStep) && (
+
+                            {/* ✅ Show Skip button only if not last step */}
+                            {activeStep !== steps.length - 1 && (
                                 <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                                     Skip
                                 </Button>
                             )}
-                            <Button onClick={handleNext}>
+                            <Button onClick={handleNext} color="primary">
                                 {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                             </Button>
                         </Box>

@@ -13,20 +13,24 @@ function App() {
 
   return (
     <>
-      <Header />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/resumeGenerator" element={<ResumeGenerator />} />
-        <Route path="/form" element={<Form />} />
-        <Route path="/*" element={<PageNotFound />} />
-      </Routes>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}       
-        theme="colored"
-      />
-      <Footer />
+      <div className="app-container">
+        <Header />
+        <div className="main-content">
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/resumeGenerator" element={<ResumeGenerator />} />
+            <Route path="/form" element={<Form />} />
+            <Route path="/*" element={<PageNotFound />} />
+          </Routes>
+        </div>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          theme="colored"
+        />
+        <Footer />
+      </div>
     </>
   )
 }

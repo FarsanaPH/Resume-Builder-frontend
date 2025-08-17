@@ -1,26 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import Card from 'react-bootstrap/Card';
-import { Link } from 'react-router-dom';
 import { deleteResumeAPI, getAllResumeAPI } from '../Service/allApi';
 import { toast } from 'react-toastify';
 import { MdDelete } from "react-icons/md";
+import { Divider } from '@mui/material';
+import { FaFileDownload } from 'react-icons/fa';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 function HistoryPage() {
 
-  const [resumeData, setResumeData] = useState([])
+  const [historyData, setHistoryData] = useState([])
 
   const getAllResume = async () => {
     try {
       const result = await getAllResumeAPI()
       console.log("result:", result);
-      setResumeData(result.data)   // In console,result gives all resumes in  key data 
+      setHistoryData(result.data)   // In console, all resumes is objects within array in key data 
     } catch (err) {
       console.log(`Server Error:`, err);
       toast.error(`Server Error: Failed in fetching Data, Please Try Again!!`)
     }
 
   }
-  console.log("resume data", resumeData);
+  console.log("history data", historyData);
 
   const handleDeleteResume = async (idToDelete) => {
     // console.log("Item id is:",idToDelete); 
@@ -42,38 +44,97 @@ function HistoryPage() {
   }, []) // <-- empty dependency array = run once on mount
 
 
+  const downloadPDF = async () => {
+    const input = document.getElementById("result") //to get the id
+    const canvas = await html2canvas(input, { scale: 3 }) //convert selected html to canvas(screenshot)
+    const imgData = canvas.toDataURL("image/png") // convert canvas into image url
 
+    // create PDF
+    const PDF = new jsPDF("p", "mm", "a4")  // create new PDF document
+    const PDFWidth = PDF.internal.pageSize.getWidth()  // get width of PDF
+    const PDFHeight = (canvas.height * PDFWidth) / canvas.width // calculate height of PDF  based on the width
+    PDF.addImage(imgData, "png", 0, 0, PDFWidth, PDFHeight)  // add image to PDF
+    PDF.save("resume.pdf") //we can give any name to save
+  }
 
   return (
     <>
-      <div className='py-3 container'>
-        <h1 className="text-center py-4">Resume Downloaded History</h1>
-        <div className="d-flex justify-content-end me-3">
-          <Link to={"/form"}><button className='btn btn-primary mb-5'>BACK</button></Link>
-        </div>
-        <div className="row">
+      <div className="container pb-5">
+        <h1 className="text-center py-4" style={{ color: 'purple' }}>Resume History</h1>
+
+        <div className="row g-4">   {/* g-4 = spacing between cols/rows */}
           {
-            resumeData?.length > 0 ? (
-              resumeData?.map((item) => (
-                <div className="col-md-3 mb-3">
-                  <Card style={{ width: '100%' }}>
-                    <Card.Body>
-                      <div className='d-flex justify-content-between'>
-                        <Card.Title>{item?.name}</Card.Title>
-                        <span className='btn m-0 p-0' onClick={() => handleDeleteResume(item?.id)}><MdDelete className='text-danger fs-3' /></span>
+            historyData?.length > 0 ? (
+              historyData.slice().reverse().map((item) => (
+                <div className="col-12 col-md-6 col-lg-4" key={item?.id}>
+                  <div className="px-3 pb-4 border rounded shadow h-100">
+                    <div className="d-flex justify-content-end gap-2">
+                      <span onClick={downloadPDF} className='pt-1' >
+                        <FaFileDownload className='fs-5 text-primary' />
+                      </span>
+                      <span onClick={() => handleDeleteResume(item?.id)} className="pt-1" >
+                        <MdDelete className="text-danger fs-3" />
+                      </span>
+                    </div>
+
+                    {/* id for pdf */}
+                    <div id="result" className=" px-3">
+                      <div className="text-center">
+                        <h3>{item?.name || "Your Name"}</h3>
+                        <span className="pt-2 text-primary">{item?.jobTitle || "Job Role"}</span>
                       </div>
-                      <Card.Subtitle className="mb-2 text-muted">{item?.jobTitle}</Card.Subtitle>
-                      <Card.Title>{item?.courseName}</Card.Title>
-                      <Card.Subtitle className="mb-2 text-muted">{item?.college} | {item?.university} | {item?.year}</Card.Subtitle>
-                    </Card.Body>
-                  </Card>
+
+                      <div className="text-center mt-2">
+                        <h6>{item?.phoneNumber || "Phone Number"} | {item?.email || "youremail@gmail.com"} | {item?.location || "Location"}</h6>
+                      </div>
+
+                      <div className="mt-2 text-center">
+                        <a href={item?.github} target="_blank" className="me-3 ms-3">Github</a> |
+                        <a href={item?.linkedIn} target="_blank" className="me-3 ms-3">LinkedIn</a> |
+                        <a href={item?.portfolio} target="_blank" className="me-3 ms-3">Portfolio</a>
+                      </div>
+
+                      <div className="mt-3">
+                        <Divider>Summary</Divider>
+                        <p style={{ textAlign: "justify" }}>
+                          {item?.summary || "Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto itaque ut suscipit qui minus doloribus similique, delectus optio autem."}
+                        </p>
+                      </div>
+
+                      <div className="mt-3 text-center">
+                        <Divider>Education</Divider>
+                        <h6 className="mt-2">{item?.courseName || "Course Name"}</h6>
+                        <h6>{item?.college || "College"} | {item?.university || "University"} | {item?.year || "Passout Year"}</h6>
+                      </div>
+
+                      <div className="mt-3 text-center">
+                        <Divider>Professional Experience</Divider>
+                        <h6 className="mt-2">{item?.jobRole || "Job Role"}</h6>
+                        <h6>{item?.company || "Company"} | {item?.companyLocation || "Location"} | {item?.duration || "Duration"}</h6>
+                      </div>
+
+                      <div className="mt-3 text-start">
+                        <Divider>Skills</Divider>
+                        <div className="m-2 d-flex flex-wrap">
+                          {item.skills?.map((skill, index) => (
+                            <span key={index} className="me-3 mt-1">{skill}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+
+                  </div>
+
                 </div>
               ))
-            ) :
-              "NO RESUME ADDED"
+            ) : (
+              <p className="text-center">NO RESUME HISTORY</p>
+            )
           }
         </div>
       </div>
+
     </>
   )
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
-import heroImg from '../assets/hero.jpg';
+import heroImg from '../assets/image.png';
 import toolsImg from '../assets/tools.png';
 
 const LandingPage = () => {
@@ -15,23 +15,35 @@ const LandingPage = () => {
           backgroundImage: `url(${heroImg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          height: '100vh',
+          height: '93vh',
           position: 'relative',
         }}
       >
+        {/* Overlay Layer */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.2)', 
+            zIndex: 1,
+          }}
+        />
         <div
           className="text-center p-4 rounded"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 2 }}
         >
           <h1 className="fw-bold">Designed to get hired.</h1>
           <p>Your skills, your story, your next job — all in one.</p>
           <Link to={"/resumeGenerator"}>
-          <button
-            className="btn mt-3 px-4 py-2"
-            style={{ backgroundColor: 'purple', color: 'white' }}
-          >
-            MAKE YOUR RESUME
-          </button>
+            <button
+              className="btn mt-3 px-4 py-2"
+              style={{ backgroundColor: 'purple', color: 'white' }}
+            >
+              MAKE YOUR RESUME
+            </button>
           </Link>
         </div>
       </div>

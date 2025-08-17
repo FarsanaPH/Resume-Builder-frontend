@@ -18,8 +18,12 @@ export const deleteResumeAPI = async (id) => {
     return await commonApi("DELETE",`${serverURL}/resumes/${id}`,"")
 }
 
-// get a particular resume API
+// get a particular resume API - to edit
 export const getEditResumeAPI  = async (id) => {
     return await commonApi("GET",`${serverURL}/resumes/${id}`,"")
 }
 
+// update Resume API
+export const updateResumeAPI = async (id,reqBody) => {   
+    return await commonApi("PUT",`${serverURL}/resumes/${id}/`,reqBody)
+}

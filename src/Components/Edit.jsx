@@ -5,12 +5,19 @@ import Button from '@mui/material/Button';
 import Modal from 'react-bootstrap/Modal';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
-import { getEditResumeAPI } from '../Service/allApi';
+import { getEditResumeAPI, updateResumeAPI } from '../Service/allApi';
 import { toast } from 'react-toastify';
 import { TiDelete } from "react-icons/ti";
 
-function Edit({ editID }) {
+function Edit({ editID, setResumeData }) {
     console.log("Edit ID:", editID);
+
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => {
+        setShow(true);
+        getEditResume();  // getEditResume function calling within handleshow function calling which is called when clikcing edit button
+    }
 
     const [editData, setEditData] = useState({
         name: "",
@@ -33,13 +40,7 @@ function Edit({ editID }) {
         summary: "",
         id: ""
     })
-
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = () => {
-        setShow(true);
-        getEditResume();  // getEditResume function calling within handleshow function calling which is called when clikcing edit button
-    }
+    const [editInputSkill, setEditInputSkill] = useState("")
 
     const getEditResume = async () => {
         try {
@@ -55,14 +56,50 @@ function Edit({ editID }) {
     }
     console.log("Edit Data is:", editData);
 
+    const updateResume = async () => {
+        if (!editData.skills || !editData.name || !editData.jobTitle || !editData.location || !editData.email || !editData.phoneNumber ||
+            !editData.github || !editData.linkedIn || !editData.portfolio || !editData.courseName || !editData.college || !editData.university ||
+            !editData.year || !editData.jobRole || !editData.company || !editData.companyLocation || !editData.duration || !editData.summary) {
+            toast.warning(`Fill the form completely!!`)
+        } else {
+            try {
+                const result = await updateResumeAPI(editID, editData)  //this gives the object with id eqauls to now submitted resume id
+                console.log("result", result);
+                setResumeData(result.data)
+                handleClose()
+
+            } catch (err) {
+                console.log("Server Error:", err);
+                toast.error("Server Error: Failed in Fetching Data, Please Try Again!!")
+
+            }
+        }
+
+    }
+
+    const addSkill = (addSkill) => {
+        console.log("added skills from add function is:", addSkill);
+
+        const upperSkill = addSkill.trim().toUpperCase(); // convert input to uppercase and trim spaces
+        if (!upperSkill) {  //ie, null,undefined or empty string added
+            toast.warning(`Enter Skill!!`);
+        } else {
+            if (editData.skills.includes(upperSkill)) {
+                toast.warning(`Skill already added...`);
+            } else {
+                setEditData({ ...editData, skills: [...editData.skills, upperSkill] });
+                setEditInputSkill("");
+            }
+        }
+    }
+
     const deleteSkill = (itemToDelete) => {
         setEditData({ ...editData, skills: editData.skills.filter(item => item !== itemToDelete) })
     }
 
-
     return (
         <>
-            <button className='btn btn-primary' onClick={handleShow}>
+            <button  onClick={handleShow} className='btn text-light' style={{ backgroundColor: 'purple' }}>
                 <FaEdit />
             </button>
 
@@ -266,8 +303,10 @@ function Edit({ editID }) {
                             variant="standard"
                             multiline
                             fullWidth
+                            value={editInputSkill}
+                            onChange={(e) => setEditInputSkill(e.target.value)}
                         />
-                        <Button className='btn btn-primary mt-3' variant='outlined'>ADD+</Button>
+                        <Button onClick={() => addSkill(editInputSkill)} className='btn btn-primary mt-3' variant='outlined'>ADD+</Button>
                         <div className="mt-3">
                             <h5>Selected Skills :</h5>
                             <div className=''>
@@ -283,9 +322,6 @@ function Edit({ editID }) {
                                 }
                             </div>
 
-                        </div>
-                        <div className="mt-3">
-                            <h5>Added Skills:</h5>
                         </div>
                     </div>
                     <div className="mt-3">
@@ -309,7 +345,7 @@ function Edit({ editID }) {
                     <button className='btn btn-danger' onClick={handleClose}>
                         Close
                     </button>
-                    <button className='btn btn-success'>Update</button>
+                    <button className='btn btn-success' onClick={updateResume}>Update</button>
                 </Modal.Footer>
             </Modal>
 
