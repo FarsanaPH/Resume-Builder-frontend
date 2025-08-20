@@ -8,7 +8,7 @@ export const commonApi = (httpRequest, url, reqBody) => {
     }
 
     return axios(reqConfig).then((res)=>{
-        return res   // backend store if res
+        return res   // backend store    if res
     }).catch((err)=>{
         return err
     })
