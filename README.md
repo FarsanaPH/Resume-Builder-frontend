@@ -54,6 +54,18 @@ This project is built using:
 - **Node.js**  – Backend runtime
 - **Vite** – Ultra-fast development build tool
 
+## 🔗 Live Demo
+
+- **Frontend**: [View on Vercel](https://resume-builder-frontend-rho.vercel.app/)
+- **Backend**(Mock API via JSON Server): [View on Render](https://resume-builder-backend-e427.onrender.com)
+
+
+## 📁 GitHub Repositories
+
+- [Frontend Repo](https://github.com/FarsanaPH/Resume-Builder-frontend)
+- [Backend Repo](https://github.com/FarsanaPH/Resume-Builder-backend)
+
+
 ---
 
 > “Great code speaks for itself — but a clean resume gets you an interview!”  — **Thanks for visiting the project.** 😊
