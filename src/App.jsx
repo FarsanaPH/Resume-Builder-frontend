@@ -15,7 +15,7 @@ function App() {
     <>
       <div className="app-container">
         <Header />
-        <div className="main-content">
+        <div className="main-content pt-5">
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/history" element={<HistoryPage />} />

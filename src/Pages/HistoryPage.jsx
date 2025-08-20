@@ -61,7 +61,7 @@ function HistoryPage() {
   return (
     <>
       <div className="container pb-5">
-        <h2 className="text-start py-4 text-secondary" >Your History</h2>
+        <h2 className="text-start py-4 pt-5 text-secondary" >Resume History</h2>
 
         <div className="row g-4">   {/* g-4 = spacing between cols/rows */}
           {

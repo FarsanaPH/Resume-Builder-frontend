@@ -15,7 +15,7 @@ const LandingPage = () => {
           backgroundImage: `url(${heroImg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          height: '93vh',
+          height: '100vh',
           position: 'relative',
         }}
       >

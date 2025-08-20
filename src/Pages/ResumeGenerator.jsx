@@ -10,7 +10,7 @@ function ResumeGenerator() {
     backgroundImage: `url(${heroImg})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    height: '100vh',
+    height: '93vh',
     position: 'relative'
   }}
 >
